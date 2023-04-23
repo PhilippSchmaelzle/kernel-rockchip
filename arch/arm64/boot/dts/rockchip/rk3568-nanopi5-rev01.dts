@@ -12,7 +12,7 @@
 #include "rk3568-nanopi5-common.dtsi"
 
 / {
-	model = "FriendlyElec NanoPi R5S";
+	model = "FriendlyElec NanoPi R5S + GPIOs";
 	compatible = "friendlyelec,nanopi-r5s", "rockchip,rk3568";
 
 	aliases {
@@ -89,6 +89,24 @@
 		gpio = <&gpio0 RK_PD4 GPIO_ACTIVE_HIGH>;
 		startup-delay-us = <5000>;
 		vin-supply = <&vcc3v3_sysp>;
+	};
+	pps_3_20 {
+		compatible = "pps-gpio";
+		gpios = <&gpio3 20 GPIO_ACTIVE_HIGH>;
+		status = "okay";
+	};
+	/*pps_3_1 {
+		compatible = "pps-gpio";
+		gpios = <&gpio3 1 GPIO_ACTIVE_HIGH>;
+		status = "okay";
+	};*/
+	pps-gen {
+		status = "okay";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pps_gen_pins>;
+		compatible = "pps-gen-gpio";
+		pps-gen-gpio = <&gpio3 21 GPIO_ACTIVE_HIGH>; /* <&main_gpio0 94 0>;*/
+		default-state = "off";
 	};
 };
 
@@ -257,6 +275,12 @@
 				<0 RK_PD3 RK_FUNC_GPIO &pcfg_pull_up>;
 		};
 	};
+	pps_gen {
+		pps_gen_pins: pinmux_pps_gen_pins {
+			rockchip,pins = 
+				<3 RK_PC5 RK_FUNC_GPIO &pcfg_output_low_pull_down>;
+		};
+	};
 };
 
 &sata2 {
@@ -290,3 +314,35 @@
 		};
 	};
 };
+
+// Enable the NanoPi R5S FPC pin header
+&uart5 {
+	status = "okay";
+    pinctrl-0 = <&uart5m1_xfer>;
+};
+&uart7 {
+	status = "disabled"; // conflcits with uart7
+	pinctrl-0 = <&uart7m1_xfer>;
+};
+&uart9 {
+	status = "okay";
+	pinctrl-0 = <&uart9m1_xfer>;
+};
+
+// Disable these so UART9 is available
+&pwm12 {
+	status = "disabled"; // conflicts with uart9
+	pinctrl-0 = <&pwm12m1_pins>;
+};
+&pwm13 {
+	status = "disabled"; // conflicts with uart9
+	pinctrl-0 = <&pwm13m1_pins>;
+};
+&pwm14 {
+	status = "okay";
+};
+&pwm15 {
+	status = "disabled";
+};
+
+
